@@ -2,9 +2,10 @@
 
 
 class DomainIssue(ValueError):
-    def __init__(self, code):
+    def __init__(self, code, details=None):
         super().__init__(code)
         self.code = code
+        self.details = details or []
 
 
 def by_kind(rows, kind):

@@ -19,7 +19,7 @@ def partition(candidates):
                 for line, row in records
             )
             continue
-        accepted.append(first)
+        accepted.append(dict(first, line=records[0][0]))
         rejected.extend(
             {
                 "line": line,

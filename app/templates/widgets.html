@@ -24,6 +24,11 @@
 <section class="panel results" aria-labelledby="panel-title">
   <div class="panel-head"><h2 id="panel-title">运行对账</h2><span id="counts"></span></div>
   <div class="scroll"><table id="rows" aria-label="阶段结果"></table></div>
+  <div class="panel-head"><h2>本次已签范围</h2><span id="scope-counts"></span></div>
+  <div class="scroll"><table id="scope" aria-label="已签范围"></table></div>
+  <div class="panel-head"><h2>签收与结转</h2><span id="handover-decision"></span></div>
+  <p id="handover-note"></p>
+  <div class="scroll"><table id="pending" aria-label="待处理记录"></table></div>
 </section>
 {% endmacro %}
 {% macro visual(p) %}
@@ -34,6 +39,11 @@
 {% endmacro %}
 {% macro archive() %}
 <aside class="panel archive"><h2>批次复核</h2><ul id="history"></ul>
+  <div id="prior" hidden>
+    <h3>旧签结果</h3>
+    <ul id="prior-runs"></ul>
+    <pre id="prior-groups"></pre>
+  </div>
   <form id="review" hidden>
     <p id="run-status"></p><label for="note">复核意见</label>
     <textarea id="note" name="note" minlength="3" maxlength="200" required></textarea>

@@ -54,6 +54,24 @@ class Store:
                 )
             ]
 
+    def recent(self, limit=50):
+        """Recent runs including their reports, newest insertion first.
+
+        Insertion order (``rowid``) is used rather than ``created`` so that two
+        batches registered within the same millisecond still have a stable
+        newest-first order for prior-signature read-back.
+        """
+        with self.connect() as db:
+            rows = db.execute(
+                "SELECT * FROM runs ORDER BY rowid DESC LIMIT ?", (limit,)
+            ).fetchall()
+        result = []
+        for row in rows:
+            item = dict(row)
+            item["report"] = json.loads(item["report"])
+            result.append(item)
+        return result
+
     def revise(self, run_id, revision, status, note, now):
         with self.connect() as db:
             cursor = db.execute(

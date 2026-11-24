@@ -1,5 +1,5 @@
 import {request} from './client.js';
-import {snapshot, history} from './view.js';
+import {snapshot, history, prior} from './view.js';
 import {visualize} from './plots.js';
 
 const form = document.querySelector('#source');
@@ -28,6 +28,7 @@ function draw() {
   if (!report) return;
   snapshot(report, selected, stage);
   visualize(report, selected);
+  prior(batch?.prior);
   for (const button of stages) button.setAttribute('aria-pressed',String(button.dataset.stage===stage));
   document.querySelector('#panel-title').textContent = stages.find(button => button.dataset.stage===stage)?.textContent || '运行对账';
   detail.hidden = !batch;

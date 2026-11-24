@@ -13,6 +13,7 @@
 | M5 运行对账 | 对照输入、采信和隔离行 | `POST /api/stages/balance` | `app/modules/reconcile.py` | `tests/test_reconcile.py` |
 | M6 批次复核 | 执行批次并签发或暂缓 | `POST /api/runs、PATCH /api/runs/<id>` | `app/review/service.py` | `tests/test_review.py` |
 | M7 证据交付 | 下载复核清单 | `GET /api/runs/<id>/evidence` | `app/evidence/render.py` | `tests/test_evidence.py` |
+| M8 签收回读 | 回读已签范围、待处理与旧签 | `POST /api/runs、GET /api/runs/<id>` | `app/modules/scope.py`、`app/review/lineage.py` | `tests/test_signoff.py` |
 
 ## 输入陷阱
 
@@ -29,6 +30,10 @@
 | TRAP-16 | 引号未闭合时拒收文件 | `app/intake/reader.py` | `tests/test_intake.py::test_unclosed_quote_invalidates_source` |
 | TRAP-18 | 区分空文件、全空白和仅表头 | `app/intake/reader.py` | `tests/test_intake.py::test_empty_states_have_distinct_causes` |
 | TRAP-26 | 拒绝旧版本复核 | `app/review/store.py` | `tests/test_review.py::test_review_optimistic_lock` |
+| TRAP-27 | 超过水位的迟到事件结转，不计入本次签收 | `app/modules/prepare.py` | `tests/test_signoff.py::test_deferred_event_is_carried_not_signed` |
+| TRAP-28 | 同键同序号冲突只隔离该记录 | `app/modules/prepare.py` | `tests/test_signoff.py::test_same_key_seq_conflict_isolates_only_that_record` |
+| TRAP-29 | 相同来源重试不新增待处理 | `app/review/service.py` | `tests/test_signoff.py::test_retry_same_source_adds_no_pending` |
+| TRAP-30 | 推进水位后重跑与全量重放一致 | `app/modules/prepare.py` | `tests/test_signoff.py::test_watermark_advance_matches_one_shot_replay` |
 
 ## 领域反例
 

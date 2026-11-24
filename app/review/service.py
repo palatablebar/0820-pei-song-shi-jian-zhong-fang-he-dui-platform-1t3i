@@ -5,10 +5,23 @@ from time import monotonic
 from app.business import DomainIssue
 from app.config import RULE_VERSION
 from app.modules.pipeline import run
+from app.review import lineage
 
 
 def now():
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+
+
+def describe(store, run_id):
+    """A stored run plus the old sign-offs it should be read against.
+
+    The prior summary is derived at read time instead of being stored in the
+    content-addressed report, so rerunning the same bytes keeps a stable report
+    and never appends pending events.
+    """
+    current = store.load(run_id)
+    current["prior"] = lineage.summarize(current, store.recent())
+    return current
 
 
 def execute(store, data):
@@ -49,6 +62,11 @@ def review(store, run_id, values):
         raise DomainIssue("STALE_REVIEW")
     if current["status"] == "APPROVED":
         raise DomainIssue("RUN_FINALIZED")
-    if status == "APPROVED" and not current["report"]["balance"]["releasable"]:
-        raise DomainIssue("UNRESOLVED_ISSUES")
+    if status == "APPROVED":
+        # Approve on time even if late events are carried, but nothing with a
+        # blocking record or a failed group may go out.
+        trade = current["report"].get("handover") or {}
+        releasable = current["report"]["balance"]["releasable"]
+        if not releasable or trade.get("blocking", 0) > 0:
+            raise DomainIssue("UNRESOLVED_ISSUES")
     return store.revise(run_id, revision, status, note.strip(), now())
